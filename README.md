@@ -22,6 +22,7 @@ Aplikasi backend perpustakaan berbasis **Golang** dan **SQLite** yang menyediaka
       "name": "Budi",
       "email": "budi@perpus.local",
       "role": "user",
+      "age": 25,
       "created_at": "2026-09-08T16:00:00Z",
       "updated_at": "2026-09-08T16:00:00Z"
     }

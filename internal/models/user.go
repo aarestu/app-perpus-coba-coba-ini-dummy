@@ -14,6 +14,7 @@ type User struct {
 	Email        string    `json:"email"`
 	PasswordHash string    `json:"-"`
 	Role         string    `json:"role"`
+	Age          int       `json:"age"`
 	CreatedAt    time.Time `json:"created_at"`
 	UpdatedAt    time.Time `json:"updated_at"`
 }
@@ -23,6 +24,7 @@ type RegisterRequest struct {
 	Name     string `json:"name"`
 	Email    string `json:"email"`
 	Password string `json:"password"`
+	Age      int    `json:"age"`
 }
 
 // Validate memvalidasi kelayakan field RegisterRequest
@@ -38,6 +40,9 @@ func (r *RegisterRequest) Validate() map[string]string {
 	}
 	if len(r.Password) < 6 {
 		errs["password"] = "Password minimal terdiri dari 6 karakter"
+	}
+	if r.Age < 0 {
+		errs["age"] = "Umur tidak boleh bernilai negatif"
 	}
 	return errs
 }

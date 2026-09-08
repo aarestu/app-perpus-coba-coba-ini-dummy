@@ -10,8 +10,8 @@ import (
 
 	"app-perpus/internal/database"
 	"app-perpus/internal/middleware"
+	"app-perpus/internal/models"
 	"app-perpus/internal/services"
-	"app-perpus/internal/utils"
 )
 
 func setupTestRouter(t *testing.T) (*http.ServeMux, *services.AuthService) {
@@ -40,10 +40,11 @@ func TestAuthHandler_RegisterAndLogin(t *testing.T) {
 	mux, _ := setupTestRouter(t)
 
 	// 1. Uji Registrasi Sukses (HTTP 201)
-	regPayload := map[string]string{
+	regPayload := map[string]any{
 		"name":     "Rudi Tabuti",
 		"email":    "rudi@perpus.local",
 		"password": "securepassword123",
+		"age":      28,
 	}
 	body, _ := json.Marshal(regPayload)
 	req := httptest.NewRequest(http.MethodPost, "/api/auth/register", bytes.NewReader(body))
@@ -54,12 +55,21 @@ func TestAuthHandler_RegisterAndLogin(t *testing.T) {
 		t.Fatalf("Status registrasi diharapkan 201, didapat %d. Body: %s", rec.Code, rec.Body.String())
 	}
 
-	var regResponse utils.SuccessResponse
+	var regResponse struct {
+		Success bool `json:"success"`
+		Data    struct {
+			Token string      `json:"token"`
+			User  models.User `json:"user"`
+		} `json:"data"`
+	}
 	if err := json.Unmarshal(rec.Body.Bytes(), &regResponse); err != nil {
 		t.Fatalf("Gagal unmarshal response registrasi: %v", err)
 	}
 	if !regResponse.Success {
 		t.Errorf("Expected success: true")
+	}
+	if regResponse.Data.User.Age != 28 {
+		t.Errorf("Expected user age 28, got %d", regResponse.Data.User.Age)
 	}
 
 	// 2. Uji Registrasi Gagal - Validasi Input (HTTP 400)
@@ -137,6 +147,17 @@ func TestAuthHandler_RegisterAndLogin(t *testing.T) {
 
 	if rec.Code != http.StatusOK {
 		t.Fatalf("Status /api/auth/me diharapkan 200, didapat %d. Body: %s", rec.Code, rec.Body.String())
+	}
+
+	var meResponse struct {
+		Success bool        `json:"success"`
+		Data    models.User `json:"data"`
+	}
+	if err := json.Unmarshal(rec.Body.Bytes(), &meResponse); err != nil {
+		t.Fatalf("Gagal unmarshal response /api/auth/me: %v", err)
+	}
+	if meResponse.Data.Age != 28 {
+		t.Errorf("Expected user age 28 in /api/auth/me, got %d", meResponse.Data.Age)
 	}
 
 	// 7. Uji Akses Rute Terproteksi /api/auth/me tanpa Token (HTTP 401)
