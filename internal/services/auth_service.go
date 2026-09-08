@@ -114,9 +114,9 @@ func (s *AuthService) Register(ctx context.Context, req models.RegisterRequest) 
 
 	now := time.Now()
 	res, err := s.db.ExecContext(ctx,
-		`INSERT INTO users (name, email, password_hash, role, age, created_at, updated_at) 
+		`INSERT INTO users (name, email, password_hash, role, height, created_at, updated_at) 
 		 VALUES (?, ?, ?, 'user', ?, ?, ?)`,
-		strings.TrimSpace(req.Name), emailNormalized, hashedPassword, req.Age, now, now,
+		strings.TrimSpace(req.Name), emailNormalized, hashedPassword, req.Height, now, now,
 	)
 	if err != nil {
 		return nil, "", fmt.Errorf("gagal menyimpan data user: %w", err)
@@ -132,7 +132,7 @@ func (s *AuthService) Register(ctx context.Context, req models.RegisterRequest) 
 		Name:      strings.TrimSpace(req.Name),
 		Email:     emailNormalized,
 		Role:      "user",
-		Age:       req.Age,
+		Height:    req.Height,
 		CreatedAt: now,
 		UpdatedAt: now,
 	}
@@ -150,9 +150,9 @@ func (s *AuthService) Login(ctx context.Context, req models.LoginRequest) (*mode
 	emailNormalized := strings.ToLower(strings.TrimSpace(req.Email))
 
 	user := &models.User{}
-	query := `SELECT id, name, email, password_hash, role, age, created_at, updated_at FROM users WHERE email = ?`
+	query := `SELECT id, name, email, password_hash, role, height, created_at, updated_at FROM users WHERE email = ?`
 	err := s.db.QueryRowContext(ctx, query, emailNormalized).Scan(
-		&user.ID, &user.Name, &user.Email, &user.PasswordHash, &user.Role, &user.Age, &user.CreatedAt, &user.UpdatedAt,
+		&user.ID, &user.Name, &user.Email, &user.PasswordHash, &user.Role, &user.Height, &user.CreatedAt, &user.UpdatedAt,
 	)
 	if errors.Is(err, sql.ErrNoRows) {
 		return nil, "", ErrInvalidCredentials
@@ -175,9 +175,9 @@ func (s *AuthService) Login(ctx context.Context, req models.LoginRequest) (*mode
 // GetUserByID mengambil data user berdasarkan ID
 func (s *AuthService) GetUserByID(ctx context.Context, id int64) (*models.User, error) {
 	user := &models.User{}
-	query := `SELECT id, name, email, role, age, created_at, updated_at FROM users WHERE id = ?`
+	query := `SELECT id, name, email, role, height, created_at, updated_at FROM users WHERE id = ?`
 	err := s.db.QueryRowContext(ctx, query, id).Scan(
-		&user.ID, &user.Name, &user.Email, &user.Role, &user.Age, &user.CreatedAt, &user.UpdatedAt,
+		&user.ID, &user.Name, &user.Email, &user.Role, &user.Height, &user.CreatedAt, &user.UpdatedAt,
 	)
 	if errors.Is(err, sql.ErrNoRows) {
 		return nil, ErrUserNotFound

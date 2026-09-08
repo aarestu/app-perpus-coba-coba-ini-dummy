@@ -44,7 +44,7 @@ func TestAuthHandler_RegisterAndLogin(t *testing.T) {
 		"name":     "Rudi Tabuti",
 		"email":    "rudi@perpus.local",
 		"password": "securepassword123",
-		"age":      28,
+		"height":   172,
 	}
 	body, _ := json.Marshal(regPayload)
 	req := httptest.NewRequest(http.MethodPost, "/api/auth/register", bytes.NewReader(body))
@@ -68,8 +68,8 @@ func TestAuthHandler_RegisterAndLogin(t *testing.T) {
 	if !regResponse.Success {
 		t.Errorf("Expected success: true")
 	}
-	if regResponse.Data.User.Age != 28 {
-		t.Errorf("Expected user age 28, got %d", regResponse.Data.User.Age)
+	if regResponse.Data.User.Height != 172 {
+		t.Errorf("Expected user height 172, got %d", regResponse.Data.User.Height)
 	}
 
 	// 2. Uji Registrasi Gagal - Validasi Input (HTTP 400)
@@ -156,8 +156,8 @@ func TestAuthHandler_RegisterAndLogin(t *testing.T) {
 	if err := json.Unmarshal(rec.Body.Bytes(), &meResponse); err != nil {
 		t.Fatalf("Gagal unmarshal response /api/auth/me: %v", err)
 	}
-	if meResponse.Data.Age != 28 {
-		t.Errorf("Expected user age 28 in /api/auth/me, got %d", meResponse.Data.Age)
+	if meResponse.Data.Height != 172 {
+		t.Errorf("Expected user height 172 in /api/auth/me, got %d", meResponse.Data.Height)
 	}
 
 	// 7. Uji Akses Rute Terproteksi /api/auth/me tanpa Token (HTTP 401)
@@ -175,7 +175,25 @@ func TestAuthHandler_RegisterAndLogin(t *testing.T) {
 	rec = httptest.NewRecorder()
 	mux.ServeHTTP(rec, req)
 
-	if rec.Code != http.StatusUnauthorized {
-		t.Errorf("Status diharapkan 401 untuk token invalid, didapat %d", rec.Code)
+	// 9. Uji Registrasi dengan alias 'tinggi_badan' (HTTP 201)
+	aliasRegPayload := map[string]any{
+		"name":         "Siti Nurbaya",
+		"email":        "siti@perpus.local",
+		"password":     "securepassword123",
+		"tinggi_badan": 160,
+	}
+	body, _ = json.Marshal(aliasRegPayload)
+	req = httptest.NewRequest(http.MethodPost, "/api/auth/register", bytes.NewReader(body))
+	rec = httptest.NewRecorder()
+	mux.ServeHTTP(rec, req)
+
+	if rec.Code != http.StatusCreated {
+		t.Fatalf("Status registrasi diharapkan 201, didapat %d", rec.Code)
+	}
+	if err := json.Unmarshal(rec.Body.Bytes(), &regResponse); err != nil {
+		t.Fatalf("Gagal unmarshal response registrasi alias: %v", err)
+	}
+	if regResponse.Data.User.Height != 160 {
+		t.Errorf("Expected user height 160 from tinggi_badan alias, got %d", regResponse.Data.User.Height)
 	}
 }

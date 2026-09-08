@@ -91,7 +91,7 @@ func TestRegisterAndLoginTableDriven(t *testing.T) {
 		Name:     "Dewi Sartika",
 		Email:    "dewi@perpus.local",
 		Password: "password123",
-		Age:      22,
+		Height:   165,
 	})
 	if err != nil {
 		t.Fatalf("Registrasi user pertama gagal: %v", err)
@@ -99,8 +99,8 @@ func TestRegisterAndLoginTableDriven(t *testing.T) {
 	if user1.ID == 0 || token1 == "" {
 		t.Errorf("ID user dan token tidak boleh kosong")
 	}
-	if user1.Age != 22 {
-		t.Errorf("Umur user mismatch: didapat %d, diharapkan %d", user1.Age, 22)
+	if user1.Height != 165 {
+		t.Errorf("Tinggi badan user mismatch: didapat %d, diharapkan %d", user1.Height, 165)
 	}
 
 	// Table driven tests untuk skenario login & registrasi lanjutan
@@ -180,8 +180,8 @@ func TestRegisterAndLoginTableDriven(t *testing.T) {
 					if user.Email != tc.loginReq.Email {
 						t.Errorf("Expected email %s, got %s", tc.loginReq.Email, user.Email)
 					}
-					if user.Age != 22 {
-						t.Errorf("Expected age 22, got %d", user.Age)
+					if user.Height != 165 {
+						t.Errorf("Expected height 165, got %d", user.Height)
 					}
 					if token == "" {
 						t.Errorf("Token tidak boleh kosong")
@@ -200,7 +200,7 @@ func TestGetUserByID(t *testing.T) {
 		Name:     "Andi",
 		Email:    "andi@perpus.local",
 		Password: "password123",
-		Age:      30,
+		Height:   175,
 	})
 	if err != nil {
 		t.Fatalf("Register gagal: %v", err)
@@ -213,8 +213,8 @@ func TestGetUserByID(t *testing.T) {
 	if foundUser.Name != "Andi" {
 		t.Errorf("Expected name 'Andi', got '%s'", foundUser.Name)
 	}
-	if foundUser.Age != 30 {
-		t.Errorf("Expected age 30, got %d", foundUser.Age)
+	if foundUser.Height != 175 {
+		t.Errorf("Expected height 175, got %d", foundUser.Height)
 	}
 
 	_, err = service.GetUserByID(ctx, 99999)
