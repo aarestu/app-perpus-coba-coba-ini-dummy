@@ -1,4 +1,4 @@
-package handlers
+package tests
 
 import (
 	"bytes"
@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"app-perpus/internal/database"
+	"app-perpus/internal/handlers"
 	"app-perpus/internal/middleware"
 	"app-perpus/internal/models"
 	"app-perpus/internal/services"
@@ -25,9 +26,9 @@ func setupLoanRouter(t *testing.T) (*http.ServeMux, *services.AuthService, *serv
 	})
 
 	authService := services.NewAuthService(db, "test-secret-key-loans", 1*time.Hour)
-	authHandler := NewAuthHandler(authService)
+	authHandler := handlers.NewAuthHandler(authService)
 	loanService := services.NewLoanService(db)
-	loanHandler := NewLoanHandler(loanService)
+	loanHandler := handlers.NewLoanHandler(loanService)
 	authMiddleware := middleware.AuthMiddleware(authService)
 
 	mux := http.NewServeMux()
@@ -108,7 +109,7 @@ func TestLoanHandler_CreateAndGetLoans(t *testing.T) {
 	mux.ServeHTTP(rec, req)
 
 	if rec.Code != http.StatusCreated {
-		t.Fatalf("Status peminjaman dengan alias diharapkan 201, didapat %d. Body: %s", rec.Code, rec.Body.String())
+		t.Fatalf("Status peminjaman dengan alias diharapkan 201, didapat %d", rec.Code)
 	}
 
 	// 3. Uji Peminjaman Buku Gagal - Tanpa Token / Belum Login (HTTP 401)

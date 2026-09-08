@@ -1,4 +1,4 @@
-package services
+package tests
 
 import (
 	"context"
@@ -7,9 +7,10 @@ import (
 
 	"app-perpus/internal/database"
 	"app-perpus/internal/models"
+	"app-perpus/internal/services"
 )
 
-func setupLoanTestDB(t *testing.T) (*LoanService, *AuthService) {
+func setupLoanTestDB(t *testing.T) (*services.LoanService, *services.AuthService) {
 	t.Helper()
 	db, err := database.InitDB(":memory:")
 	if err != nil {
@@ -19,8 +20,8 @@ func setupLoanTestDB(t *testing.T) (*LoanService, *AuthService) {
 		_ = db.Close()
 	})
 
-	authService := NewAuthService(db, "test-jwt-secret-key-12345", 1*time.Hour)
-	loanService := NewLoanService(db)
+	authService := services.NewAuthService(db, "test-jwt-secret-key-12345", 1*time.Hour)
+	loanService := services.NewLoanService(db)
 
 	return loanService, authService
 }
@@ -95,7 +96,7 @@ func TestLoanService_CreateLoan(t *testing.T) {
 		if err == nil {
 			t.Fatalf("Diharapkan error user tidak ditemukan, tapi berhasil")
 		}
-		if err != ErrUserNotFound {
+		if err != services.ErrUserNotFound {
 			t.Errorf("Diharapkan ErrUserNotFound, didapat: %v", err)
 		}
 	})
@@ -183,7 +184,7 @@ func TestLoanService_GetLoanByID(t *testing.T) {
 	}
 
 	_, err = loanService.GetLoanByID(ctx, 88888)
-	if err != ErrLoanNotFound {
+	if err != services.ErrLoanNotFound {
 		t.Errorf("Diharapkan ErrLoanNotFound untuk ID pinjaman tidak valid, didapat: %v", err)
 	}
 }
