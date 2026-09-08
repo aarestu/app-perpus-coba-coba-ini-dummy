@@ -45,6 +45,9 @@ func main() {
 	authHandler := handlers.NewAuthHandler(authService)
 	authMiddleware := middleware.AuthMiddleware(authService)
 
+	loanService := services.NewLoanService(db)
+	loanHandler := handlers.NewLoanHandler(loanService)
+
 	// 3. Router & Rute API
 	mux := http.NewServeMux()
 
@@ -60,8 +63,9 @@ func main() {
 	mux.HandleFunc("/api/auth/register", authHandler.Register)
 	mux.HandleFunc("/api/auth/login", authHandler.Login)
 
-	// Protected auth routes
+	// Protected routes
 	mux.Handle("/api/auth/me", authMiddleware(http.HandlerFunc(authHandler.Me)))
+	mux.Handle("/api/loans", authMiddleware(http.HandlerFunc(loanHandler.HandleLoans)))
 
 	server := &http.Server{
 		Addr:         ":" + port,

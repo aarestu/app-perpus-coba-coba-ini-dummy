@@ -1,13 +1,15 @@
-# App Perpustakaan - Modul Autentikasi
+# App Perpustakaan - Modul Autentikasi & Peminjaman Buku
 
-Aplikasi backend perpustakaan berbasis **Golang** dan **SQLite** yang menyediakan sistem autentikasi pengguna dan proteksi endpoint menggunakan JSON Web Token (JWT).
+Aplikasi backend perpustakaan berbasis **Golang** dan **SQLite** yang menyediakan sistem autentikasi pengguna dan peminjaman buku dengan proteksi endpoint menggunakan JSON Web Token (JWT).
 
 ## Fitur
 - **Pendaftaran Pengguna (`POST /api/auth/register`):** Registrasi akun baru dengan validasi format input dan enkripsi password menggunakan Bcrypt.
 - **Login Pengguna (`POST /api/auth/login`):** Verifikasi kredensial email & password serta penerbitan token JWT.
 - **Profil Pengguna (`GET /api/auth/me`):** Endpoint terproteksi menggunakan JWT Auth Middleware.
+- **Peminjaman Buku (`POST /api/loans`):** Endpoint terproteksi untuk meminjam buku yang terintegrasi dengan tabel `users` (mendukung field `book_title` / `judul_buku` dan `duration_days`).
+- **Riwayat Peminjaman (`GET /api/loans`):** Endpoint terproteksi untuk mengambil riwayat peminjaman buku pengguna yang sedang login.
 - **Health Check (`GET /api/health`):** Endpoint pengecekan status server.
-- **Database SQLite:** Penyimpanan data persisten pada tabel `users` dengan index unik pada kolom email.
+- **Database SQLite:** Penyimpanan data persisten pada tabel `users` dan `loans` dengan foreign key constraints dan indexing.
 
 ## Konvensi API Response
 
